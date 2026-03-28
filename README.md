@@ -1,5 +1,7 @@
 ## Distributed Dropbox-like Storage
 
+![Demo](./public/demo.png)
+
 ```
 Client
 ↓
@@ -9,6 +11,5 @@ Upload Service ──→ MQ ──→ Chunk Workers ──→ Storage
     │                 │
     │                 └──→ Metadata Service (DB)
     │
-    └──→ Events → MQ → Sync/Notification/Analytics```tsx
-import { Button } from "@/components/ui/button";
+    └──→ Events → MQ → Sync/Notification/Analytics
 ```
