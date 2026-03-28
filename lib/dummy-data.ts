@@ -6,7 +6,7 @@ const mockFolders: FolderType[] = [
     name: "root",
     type: "folder",
     parent: null,
-    uploadedBy: "System",
+    owner: "System",
     dateModified: new Date("2024-01-01"),
   },
   {
@@ -14,7 +14,7 @@ const mockFolders: FolderType[] = [
     name: "Documents",
     type: "folder",
     parent: "root",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-10-15"),
   },
   {
@@ -22,7 +22,7 @@ const mockFolders: FolderType[] = [
     name: "Images",
     type: "folder",
     parent: "root",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-11-20"),
   },
   {
@@ -30,7 +30,7 @@ const mockFolders: FolderType[] = [
     name: "Work",
     type: "folder",
     parent: "root",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-12-01"),
   },
   {
@@ -38,7 +38,7 @@ const mockFolders: FolderType[] = [
     name: "Presentations",
     type: "folder",
     parent: "3",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-11-10"),
   },
   {
@@ -46,7 +46,7 @@ const mockFolders: FolderType[] = [
     name: "Projects",
     type: "folder",
     parent: "root",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-12-05"),
   },
   {
@@ -54,7 +54,7 @@ const mockFolders: FolderType[] = [
     name: "Archive",
     type: "folder",
     parent: "root",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-09-01"),
   },
   {
@@ -62,7 +62,7 @@ const mockFolders: FolderType[] = [
     name: "Shared",
     type: "folder",
     parent: "root",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-12-10"),
   },
   {
@@ -70,7 +70,7 @@ const mockFolders: FolderType[] = [
     name: "Q4 2024",
     type: "folder",
     parent: "3",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-12-15"),
   },
 ]
@@ -83,7 +83,7 @@ const mockFiles: FileType[] = [
     url: "/files/resume.pdf",
     parent: "root",
     size: "1.2 MB",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-08-20"),
   },
   {
@@ -93,7 +93,7 @@ const mockFiles: FileType[] = [
     url: "/files/proposal.docx",
     parent: "1",
     size: "2.5 MB",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-10-12"),
   },
   {
@@ -103,7 +103,7 @@ const mockFiles: FileType[] = [
     url: "/files/vacation.jpg",
     parent: "2",
     size: "3.7 MB",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-07-15"),
   },
   {
@@ -113,7 +113,7 @@ const mockFiles: FileType[] = [
     url: "/files/profile.png",
     parent: "2",
     size: "1.8 MB",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-06-01"),
   },
   {
@@ -123,7 +123,7 @@ const mockFiles: FileType[] = [
     url: "/files/q4-report.pptx",
     parent: "8",
     size: "5.2 MB",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-12-14"),
   },
   {
@@ -133,7 +133,7 @@ const mockFiles: FileType[] = [
     url: "/files/budget.xlsx",
     parent: "3",
     size: "1.5 MB",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-11-30"),
   },
   {
@@ -143,7 +143,7 @@ const mockFiles: FileType[] = [
     url: "/files/notes.txt",
     parent: "5",
     size: "12 KB",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-12-08"),
   },
   {
@@ -153,7 +153,7 @@ const mockFiles: FileType[] = [
     url: "/files/mockup.fig",
     parent: "5",
     size: "8.4 MB",
-    uploadedBy: "You",
+    owner: "You",
     dateModified: new Date("2024-12-06"),
   },
 ]

@@ -111,7 +111,7 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
                   {item.name}
                 </TableCell>
                 <TableCell className="py-4 align-middle text-sm text-muted-foreground">
-                  {item.uploadedBy}
+                  {item.owner}
                 </TableCell>
                 <TableCell className="py-4 align-middle text-sm text-muted-foreground">
                   {item.type === "folder" ? "—" : item.size}
