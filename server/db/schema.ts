@@ -1,26 +1,33 @@
+import { boolean } from "drizzle-orm/gel-core"
 import { index, int, singlestoreTable, timestamp, varchar } from "drizzle-orm/singlestore-core"
 
 export const files = singlestoreTable("files_table", {
-  id: int().primaryKey().autoincrement(),
+  id: varchar({ length: 36 })
+  .primaryKey()
+  .$defaultFn(() => crypto.randomUUID()),
   url: varchar({ length: 255 }).notNull(),
   name: varchar({ length: 255 }).notNull(),
-  parent: int(),
+  parent_id: varchar({length: 36}),
   size: int(),
   owner: varchar({ length: 255 }).notNull(),
-  dateModified: timestamp('modified_at').notNull(),
+  modified_at: timestamp('modified_at').notNull(),
+  is_deleted: boolean().notNull().default(false),
 }, 
 (t) => {
-  return [index("idx_parent").on(t.parent)]
+  return [index("idx_files_parent").on(t.parent_id)]
 })
 
 export const folders = singlestoreTable("folders_table", {
-  id: int().primaryKey().autoincrement(),
+   id: varchar({ length: 36 })
+  .primaryKey()
+  .$defaultFn(() => crypto.randomUUID()),
+  item_count: int().notNull().default(0),
   name: varchar({ length: 255 }).notNull(),
-  parent: int(),
-  size: int(),
+  parent_id: varchar({length: 36}),
   owner: varchar({ length: 255 }).notNull(),
-  dateModified: timestamp('modified_at').notNull(),
+  modified_at: timestamp('modified_at').notNull(),
+  is_deleted: boolean().notNull().default(false),
 }, 
 (t) => {
-  return [index("idx_parent").on(t.parent)]
+  return [index("idx_folders_parent").on(t.parent_id)]
 })

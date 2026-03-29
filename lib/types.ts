@@ -1,23 +1,24 @@
-export type StorageItem = FileType | FolderType; 
+export type StorageItem = FileType | FolderType
 
 export type FileType = {
-  id: string;
-  name: string;
-  type: "file";
-  url: string;
-  owner: string;
-  dateModified: Date;
-  parent: string;
-  size: string;
+  id: string
+  url: string
+  name: string
+  parent_id: string | null
+  size: number
+  owner: string
+  modified_at: Date
+  is_deleted: boolean
+  type: "file"
 }
 
-export type FolderType= {
-  id: string;
-  name: string;
-  type: "folder";
-  parent: string | null;
-  owner: string;
-  dateModified: Date;
-};
-
-
+export type FolderType = {
+  id: string
+  item_count: number
+  name: string
+  parent_id: string | null
+  owner: string
+  modified_at: Date
+  is_deleted: boolean
+  type: "folder"
+}
