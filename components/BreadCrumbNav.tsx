@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/breadcrumb"
 
 interface BreadcrumbNavProps {
-  path: { id: string; name: string }[]
+  path: { id: string | null; name: string }[]
   onNavigate: (index: number) => void
 }
 

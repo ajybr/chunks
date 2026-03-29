@@ -8,25 +8,27 @@ import { BreadcrumbNav } from "@/components/BreadCrumbNav"
 import { UploadButton } from "@/components/UploadButton"
 import { FileTable } from "./FileTable"
 import { TableSkeleton } from "@/components/TableSkeleton"
-import { StorageItem } from "@/lib/types"
+import { Node } from "@/lib/types"
 
 interface StorageLayoutProps {
-  items: StorageItem[]
+  items: Node[]
 }
 
 export function StorageLayout({ items }: StorageLayoutProps) {
   const [searchQuery, setSearchQuery] = useState("")
-  const [currentFolderId, setCurrentFolderId] = useState("root")
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(
+    "550e8400-e29b-41d4-a716-446655440001"
+  )
   const [breadcrumbPath, setBreadcrumbPath] = useState<
-    { id: string; name: string }[]
-  >([{ id: "root", name: "My Files" }])
+    { id: string | null; name: string }[]
+  >([{ id: null, name: "My Files" }])
   const [isLoading, setIsLoading] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const dragCounterRef = useRef(0)
 
   const filteredItems = items.filter(
     (item) =>
-      item.parent === currentFolderId &&
+      item.parent_id === currentFolderId &&
       item.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 

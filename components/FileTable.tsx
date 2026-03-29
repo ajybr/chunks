@@ -33,10 +33,10 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
 import { Button } from "@/components/ui/button"
-import type { StorageItem } from "@/lib/types"
+import type { Node } from "@/lib/types"
 
 interface FileTableProps {
-  items: StorageItem[]
+  items: Node[]
   onFolderClick?: (folderId: string, folderName: string) => void
 }
 
@@ -76,7 +76,7 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
           <TableRow className="bg-muted/50">
             <TableHead className="w-12">Type</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>Uploaded By</TableHead>
+            <TableHead>Owner</TableHead>
             <TableHead className="w-32">File Size</TableHead>
             <TableHead className="w-40">Date Modified</TableHead>
             <TableHead className="w-12"></TableHead>
@@ -117,7 +117,7 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
                   {item.type === "folder" ? "—" : item.size}
                 </TableCell>
                 <TableCell className="py-4 align-middle text-sm text-muted-foreground">
-                  {formatDate(item.dateModified)}
+                  {formatDate(item.modified_at)}
                 </TableCell>
                 <TableCell>
                   {hoveredId === item.id && (

@@ -1,6 +1,7 @@
-import type { FileType, FolderType, StorageItem } from "./types"
+import type { Node, FileMetaData, FolderMetaData } from "./types"
 
-export const mockFolders: FolderType[] = [
+export const mockItems: Node[] = [
+  // Folders
   {
     id: "550e8400-e29b-41d4-a716-446655440001",
     name: "root",
@@ -8,7 +9,6 @@ export const mockFolders: FolderType[] = [
     parent_id: null,
     owner: "System",
     modified_at: new Date("2024-01-01"),
-    item_count: 8,
     is_deleted: false,
   },
   {
@@ -18,7 +18,6 @@ export const mockFolders: FolderType[] = [
     parent_id: "550e8400-e29b-41d4-a716-446655440001",
     owner: "You",
     modified_at: new Date("2024-10-15"),
-    item_count: 1,
     is_deleted: false,
   },
   {
@@ -28,7 +27,6 @@ export const mockFolders: FolderType[] = [
     parent_id: "550e8400-e29b-41d4-a716-446655440001",
     owner: "You",
     modified_at: new Date("2024-11-20"),
-    item_count: 2,
     is_deleted: false,
   },
   {
@@ -38,7 +36,6 @@ export const mockFolders: FolderType[] = [
     parent_id: "550e8400-e29b-41d4-a716-446655440001",
     owner: "You",
     modified_at: new Date("2024-12-01"),
-    item_count: 3,
     is_deleted: false,
   },
   {
@@ -48,7 +45,6 @@ export const mockFolders: FolderType[] = [
     parent_id: "550e8400-e29b-41d4-a716-446655440004",
     owner: "You",
     modified_at: new Date("2024-11-10"),
-    item_count: 0,
     is_deleted: false,
   },
   {
@@ -58,7 +54,6 @@ export const mockFolders: FolderType[] = [
     parent_id: "550e8400-e29b-41d4-a716-446655440001",
     owner: "You",
     modified_at: new Date("2024-12-05"),
-    item_count: 2,
     is_deleted: false,
   },
   {
@@ -68,7 +63,6 @@ export const mockFolders: FolderType[] = [
     parent_id: "550e8400-e29b-41d4-a716-446655440001",
     owner: "You",
     modified_at: new Date("2024-09-01"),
-    item_count: 0,
     is_deleted: false,
   },
   {
@@ -78,7 +72,6 @@ export const mockFolders: FolderType[] = [
     parent_id: "550e8400-e29b-41d4-a716-446655440001",
     owner: "You",
     modified_at: new Date("2024-12-10"),
-    item_count: 0,
     is_deleted: false,
   },
   {
@@ -88,19 +81,14 @@ export const mockFolders: FolderType[] = [
     parent_id: "550e8400-e29b-41d4-a716-446655440004",
     owner: "You",
     modified_at: new Date("2024-12-15"),
-    item_count: 1,
     is_deleted: false,
   },
-]
-
-export const mockFiles: FileType[] = [
+  // Files
   {
     id: "550e8400-e29b-41d4-a716-446655440101",
     name: "Resume.pdf",
     type: "file",
-    url: "/files/resume.pdf",
     parent_id: "550e8400-e29b-41d4-a716-446655440001",
-    size: 1200,
     owner: "You",
     modified_at: new Date("2024-08-20"),
     is_deleted: false,
@@ -109,9 +97,7 @@ export const mockFiles: FileType[] = [
     id: "550e8400-e29b-41d4-a716-446655440102",
     name: "Project Proposal.docx",
     type: "file",
-    url: "/files/proposal.docx",
     parent_id: "550e8400-e29b-41d4-a716-446655440002",
-    size: 2500,
     owner: "You",
     modified_at: new Date("2024-10-12"),
     is_deleted: false,
@@ -120,9 +106,7 @@ export const mockFiles: FileType[] = [
     id: "550e8400-e29b-41d4-a716-446655440103",
     name: "Vacation.jpg",
     type: "file",
-    url: "/files/vacation.jpg",
     parent_id: "550e8400-e29b-41d4-a716-446655440003",
-    size: 3700,
     owner: "You",
     modified_at: new Date("2024-07-15"),
     is_deleted: false,
@@ -131,9 +115,7 @@ export const mockFiles: FileType[] = [
     id: "550e8400-e29b-41d4-a716-446655440104",
     name: "Profile Picture.png",
     type: "file",
-    url: "/files/profile.png",
     parent_id: "550e8400-e29b-41d4-a716-446655440003",
-    size: 1800,
     owner: "You",
     modified_at: new Date("2024-06-01"),
     is_deleted: false,
@@ -142,9 +124,7 @@ export const mockFiles: FileType[] = [
     id: "550e8400-e29b-41d4-a716-446655440105",
     name: "Q4 Report.pptx",
     type: "file",
-    url: "/files/q4-report.pptx",
     parent_id: "550e8400-e29b-41d4-a716-446655440009",
-    size: 5200,
     owner: "You",
     modified_at: new Date("2024-12-14"),
     is_deleted: false,
@@ -153,9 +133,7 @@ export const mockFiles: FileType[] = [
     id: "550e8400-e29b-41d4-a716-446655440106",
     name: "Budget.xlsx",
     type: "file",
-    url: "/files/budget.xlsx",
     parent_id: "550e8400-e29b-41d4-a716-446655440004",
-    size: 1500,
     owner: "You",
     modified_at: new Date("2024-11-30"),
     is_deleted: false,
@@ -164,9 +142,7 @@ export const mockFiles: FileType[] = [
     id: "550e8400-e29b-41d4-a716-446655440107",
     name: "Meeting Notes.txt",
     type: "file",
-    url: "/files/notes.txt",
     parent_id: "550e8400-e29b-41d4-a716-446655440006",
-    size: 12,
     owner: "You",
     modified_at: new Date("2024-12-08"),
     is_deleted: false,
@@ -175,13 +151,102 @@ export const mockFiles: FileType[] = [
     id: "550e8400-e29b-41d4-a716-446655440108",
     name: "Design Mockup.fig",
     type: "file",
-    url: "/files/mockup.fig",
     parent_id: "550e8400-e29b-41d4-a716-446655440006",
-    size: 8400,
     owner: "You",
     modified_at: new Date("2024-12-06"),
     is_deleted: false,
   },
 ]
 
-export const dummyStorageItems: StorageItem[] = [...mockFolders, ...mockFiles]
+export const mockFileMetadata: FileMetaData[] = [
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440101",
+    url: "/files/resume.pdf",
+    size: 1200,
+    mime_type: "application/pdf",
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440102",
+    url: "/files/proposal.docx",
+    size: 2500,
+    mime_type:
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440103",
+    url: "/files/vacation.jpg",
+    size: 3700,
+    mime_type: "image/jpeg",
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440104",
+    url: "/files/profile.png",
+    size: 1800,
+    mime_type: "image/png",
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440105",
+    url: "/files/q4-report.pptx",
+    size: 5200,
+    mime_type:
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440106",
+    url: "/files/budget.xlsx",
+    size: 1500,
+    mime_type:
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440107",
+    url: "/files/notes.txt",
+    size: 12,
+    mime_type: "text/plain",
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440108",
+    url: "/files/mockup.fig",
+    size: 8400,
+    mime_type: "application/octet-stream",
+  },
+]
+
+export const mockFolderMetadata: FolderMetaData[] = [
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440001",
+    item_count: 8,
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440002",
+    item_count: 1,
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440003",
+    item_count: 2,
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440004",
+    item_count: 3,
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440005",
+    item_count: 0,
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440006",
+    item_count: 2,
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440007",
+    item_count: 0,
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440008",
+    item_count: 0,
+  },
+  {
+    node_id: "550e8400-e29b-41d4-a716-446655440009",
+    item_count: 1,
+  },
+]

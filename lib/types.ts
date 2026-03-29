@@ -1,24 +1,27 @@
-export type StorageItem = FileType | FolderType
-
-export type FileType = {
+export type Node = {
   id: string
-  url: string
-  name: string
   parent_id: string | null
-  size: number
   owner: string
+  name: string
+  type: "file" | "folder"
   modified_at: Date
   is_deleted: boolean
-  type: "file"
+  // File-specific fields
+  url?: string
+  size?: number
+  mime_type?: string
+  // Folder-specific fields
+  item_count?: number
 }
 
-export type FolderType = {
-  id: string
+export type FileMetaData = {
+  node_id: string
+  url: string
+  size: number
+  mime_type: string
+}
+
+export type FolderMetaData = {
+  node_id: string
   item_count: number
-  name: string
-  parent_id: string | null
-  owner: string
-  modified_at: Date
-  is_deleted: boolean
-  type: "folder"
 }

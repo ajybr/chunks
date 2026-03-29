@@ -1,33 +1,28 @@
 import { boolean } from "drizzle-orm/gel-core"
 import { index, int, singlestoreTable, timestamp, varchar } from "drizzle-orm/singlestore-core"
 
-export const files = singlestoreTable("files_table", {
-  id: varchar({ length: 36 })
-  .primaryKey()
-  .$defaultFn(() => crypto.randomUUID()),
-  url: varchar({ length: 255 }).notNull(),
-  name: varchar({ length: 255 }).notNull(),
-  parent_id: varchar({length: 36}),
-  size: int(),
-  owner: varchar({ length: 255 }).notNull(),
-  modified_at: timestamp('modified_at').notNull(),
-  is_deleted: boolean().notNull().default(false),
-}, 
-(t) => {
-  return [index("idx_files_parent").on(t.parent_id)]
+export const node = singlestoreTable("nodes_table", {
+  id:          varchar({ length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  parent_id:   varchar({ length: 36 }),
+  owner:       varchar({ length: 255 }).notNull(),
+  name:        varchar({ length: 255 }).notNull(),
+  type:        varchar({ length: 10 }).notNull(),  // "file" | "folder"
+  modified_at: timestamp().notNull(),
+  is_deleted:  boolean().notNull().default(false),
+},
+(t) => [
+  index("idx_parent").on(t.parent_id),
+  index("idx_owner").on(t.owner),
+])
+
+export const fileMetadata = singlestoreTable("file_metadata_table", {
+  node_id:   varchar({ length: 36 }).primaryKey(),  // 1-to-1 with nodes
+  url:       varchar({ length: 255 }).notNull(),     
+  size:      int().notNull(),                       
+  mime_type: varchar({ length: 127 }).notNull(),     
 })
 
-export const folders = singlestoreTable("folders_table", {
-   id: varchar({ length: 36 })
-  .primaryKey()
-  .$defaultFn(() => crypto.randomUUID()),
-  item_count: int().notNull().default(0),
-  name: varchar({ length: 255 }).notNull(),
-  parent_id: varchar({length: 36}),
-  owner: varchar({ length: 255 }).notNull(),
-  modified_at: timestamp('modified_at').notNull(),
-  is_deleted: boolean().notNull().default(false),
-}, 
-(t) => {
-  return [index("idx_folders_parent").on(t.parent_id)]
+export const folderMetadata = singlestoreTable("folder_metadata_table", {
+  node_id:    varchar({ length: 36 }).primaryKey(),  // 1-to-1 with nodes
+  item_count: int().notNull().default(0),            
 })
