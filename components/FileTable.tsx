@@ -9,6 +9,7 @@ import {
   Share2,
   Edit,
   Trash2,
+  Star,
 } from "lucide-react"
 import {
   Table,
@@ -37,7 +38,7 @@ import type { Node } from "@/lib/types"
 
 interface FileTableProps {
   items: Node[]
-  onFolderClick?: (folderId: string, folderName: string) => void
+  onFolderClick?: (folderId: string) => void
 }
 
 export function FileTable({ items, onFolderClick }: FileTableProps) {
@@ -85,90 +86,104 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
         <TableBody>
           {items.map((item) => (
             <ContextMenu key={item.id}>
-              {/*
-              Add a context menu trigger -right click anywhere on a table column invokes the context menu
-              */}
-              <TableRow
-                onClick={() => {
-                  if (item.type === "folder") {
-                    onFolderClick?.(item.id, item.name)
-                  } else {
-                    window.open(item.url, "_blank")
-                  }
-                }}
-                onMouseEnter={() => setHoveredId(item.id)}
-                onMouseLeave={() => setHoveredId(null)}
-                className="cursor-pointer transition-colors hover:bg-muted/50"
-              >
-                <TableCell className="py-4 align-middle">
-                  {item.type === "folder" ? (
-                    <Folder className="h-5 w-5 text-amber-500" />
-                  ) : (
-                    <File className="h-5 w-5 text-blue-500" />
-                  )}
-                </TableCell>
-                <TableCell className="py-4 align-middle font-medium">
-                  {item.name}
-                </TableCell>
-                <TableCell className="py-4 align-middle text-sm text-muted-foreground">
-                  {item.owner}
-                </TableCell>
-                <TableCell className="py-4 align-middle text-sm text-muted-foreground">
-                  {item.type === "folder" ? "—" : item.size}
-                </TableCell>
-                <TableCell className="py-4 align-middle text-sm text-muted-foreground">
-                  {formatDate(item.modified_at)}
-                </TableCell>
-                <TableCell>
-                  {hoveredId === item.id && (
-                    <DropdownMenu
-                      open={openMenuId === item.id}
-                      onOpenChange={(open) =>
-                        setOpenMenuId(open ? item.id : null)
-                      }
-                    >
-                      <DropdownMenuTrigger onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Ellipsis className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem
-                          onClick={() => handleMenuAction("download", item.id)}
-                          className="gap-2"
+              <ContextMenuTrigger>
+                <TableRow
+                  onClick={() => {
+                    if (item.type === "folder") {
+                      onFolderClick?.(item.id)
+                    } else {
+                      item.url && window.open(item.url, "_blank")
+                    }
+                  }}
+                  onMouseEnter={() => setHoveredId(item.id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  className="cursor-pointer transition-colors hover:bg-muted/50"
+                >
+                  <TableCell className="py-4 align-middle">
+                    {item.type === "folder" ? (
+                      <Folder className="h-5 w-5 text-amber-500" />
+                    ) : (
+                      <File className="h-5 w-5 text-blue-500" />
+                    )}
+                  </TableCell>
+                  <TableCell className="py-4 align-middle font-medium">
+                    {item.name}
+                  </TableCell>
+                  <TableCell className="py-4 align-middle text-sm text-muted-foreground">
+                    {item.owner}
+                  </TableCell>
+                  <TableCell className="py-4 align-middle text-sm text-muted-foreground">
+                    {item.type === "folder" ? "—" : item.size}
+                  </TableCell>
+                  <TableCell className="py-4 align-middle text-sm text-muted-foreground">
+                    {formatDate(item.modified_at)}
+                  </TableCell>
+                  <TableCell>
+                    {hoveredId === item.id && (
+                      <DropdownMenu
+                        open={openMenuId === item.id}
+                        onOpenChange={(open) =>
+                          setOpenMenuId(open ? item.id : null)
+                        }
+                      >
+                        <DropdownMenuTrigger
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          <Download className="h-4 w-4" />
-                          Download
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleMenuAction("share", item.id)}
-                          className="gap-2"
-                        >
-                          <Share2 className="h-4 w-4" />
-                          Share
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleMenuAction("rename", item.id)}
-                          className="gap-2"
-                        >
-                          <Edit className="h-4 w-4" />
-                          Rename
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          variant="destructive"
-                          onClick={() => handleMenuAction("delete", item.id)}
-                          className="gap-2"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </TableCell>
-              </TableRow>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
+                            <Ellipsis className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleMenuAction("download", item.id)
+                            }
+                            className="gap-2"
+                          >
+                            <Download className="h-4 w-4" />
+                            Download
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleMenuAction("share", item.id)}
+                            className="gap-2"
+                          >
+                            <Share2 className="h-4 w-4" />
+                            Share
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleMenuAction("star", item.id)}
+                            className="gap-2"
+                          >
+                            <Star className="h-4 w-4" />
+                            Star
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleMenuAction("rename", item.id)}
+                            className="gap-2"
+                          >
+                            <Edit className="h-4 w-4" />
+                            Rename
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => handleMenuAction("delete", item.id)}
+                            className="gap-2"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </TableCell>
+                </TableRow>
+              </ContextMenuTrigger>
               <ContextMenuContent className="w-48">
                 <ContextMenuItem
                   onClick={() => handleMenuAction("download", item.id)}

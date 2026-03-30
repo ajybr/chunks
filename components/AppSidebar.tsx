@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { FileStack, House, Trash2, Users, FileImage } from "lucide-react"
+import { FileStack, House, Trash2, Users, FileImage, Star } from "lucide-react"
 import Link from "next/link"
 
 import {
@@ -20,6 +20,12 @@ const navItems = [
     title: "Home",
     url: "/",
     icon: House,
+  },
+  {
+    title: "Favorites",
+    url: "/favorites",
+    icon: Star,
+    badge: "coming soon",
   },
   {
     title: "Trash",
