@@ -5,6 +5,7 @@ export const node = singlestoreTable("nodes_table", {
   id:          varchar({ length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   parent_id:   varchar({ length: 36 }),
   owner:       varchar({ length: 255 }).notNull(),
+  // @ts-ignore
   name:        varchar({ length: 255 }).notNull(),
   type:        varchar({ length: 10 }).notNull(),  // "file" | "folder"
   modified_at: timestamp().notNull(),

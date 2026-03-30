@@ -86,7 +86,7 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
         <TableBody>
           {items.map((item) => (
             <ContextMenu key={item.id}>
-              <ContextMenuTrigger>
+              {/* <ContextMenuTrigger> */}
                 <TableRow
                   onClick={() => {
                     if (item.type === "folder") {
@@ -183,7 +183,7 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
                     )}
                   </TableCell>
                 </TableRow>
-              </ContextMenuTrigger>
+              {/* </ContextMenuTrigger> */}
               <ContextMenuContent className="w-48">
                 <ContextMenuItem
                   onClick={() => handleMenuAction("download", item.id)}
