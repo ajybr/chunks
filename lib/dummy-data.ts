@@ -1,4 +1,4 @@
-import type { Node, FileMetaData, FolderMetaData } from "./types"
+import type { Node, FileMetadata, FolderMetadata } from "./types"
 
 export const mockItems: Node[] = [
   // Folders
@@ -158,7 +158,7 @@ export const mockItems: Node[] = [
   },
 ]
 
-export const mockFileMetadata: FileMetaData[] = [
+export const mockFileMetadata: FileMetadata[] = [
   {
     node_id: "550e8400-e29b-41d4-a716-446655440101",
     url: "/files/resume.pdf",
@@ -212,7 +212,7 @@ export const mockFileMetadata: FileMetaData[] = [
   },
 ]
 
-export const mockFolderMetadata: FolderMetaData[] = [
+export const mockFolderMetadata: FolderMetadata[] = [
   {
     node_id: "550e8400-e29b-41d4-a716-446655440001",
     item_count: 8,

@@ -6,22 +6,22 @@ export type Node = {
   type: "file" | "folder"
   modified_at: Date
   is_deleted: boolean
-  // File-specific fields
   url?: string
-  size?: number
-  mime_type?: string
-  // Folder-specific fields
-  item_count?: number
+  size?: number | string
 }
 
-export type FileMetaData = {
+export type BreadcrumbItem = { id: string | null; name: string }
+
+export type FileMetadata = {
   node_id: string
   url: string
   size: number
   mime_type: string
 }
 
-export type FolderMetaData = {
+export type FolderMetadata = {
   node_id: string
   item_count: number
 }
+
+export type StorageItem = (Node & FileMetadata) | (Node & FolderMetadata)
