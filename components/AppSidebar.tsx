@@ -1,15 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-	FileStack,
-	House,
-	Trash2,
-	Users,
-	FileImage,
-	Star,
-	Cloudy,
-} from "lucide-react";
+import { House, Trash2, Users, FileImage, Star, Cloudy } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -25,8 +17,14 @@ import {
 	SidebarMenuItem,
 	SidebarRail,
 } from "@/components/ui/sidebar";
-import { Show, SignUpButton, SignInButton, UserButton } from "@clerk/nextjs";
+import { Show, SignUpButton, SignInButton, useUser } from "@clerk/nextjs";
 import { Button } from "./ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import Image from "next/image";
 
 const navItems = [
 	{
@@ -61,12 +59,14 @@ const navItems = [
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	const userData = useUser();
+
 	return (
-		<Sidebar collapsible="offcanvas" {...props}>
+		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<a href="/" className="flex gap-3 ">
-					<Cloudy className="size-5! " />
-					<span className="text-base text-primary font-semibold">Chunks</span>
+				<a href="/" className="flex gap-3">
+					<Cloudy className="size-5!" />
+					<span className="text-base font-semibold text-primary">Chunks</span>
 				</a>
 			</SidebarHeader>
 
@@ -76,10 +76,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						<SidebarGroupLabel>Menu</SidebarGroupLabel>
 						<SidebarMenu>
 							{navItems.map((item) => (
-								<SidebarMenuItem
-									className="flex items-center "
-									key={item.title}
-								>
+								<SidebarMenuItem className="flex items-center" key={item.title}>
 									<SidebarMenuButton tooltip={item.title}>
 										{item.disabled ? (
 											<button
@@ -118,23 +115,55 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarContent>
 
 			<SidebarFooter>
-				<div className="px-2 py-1 text-xs text-muted-foreground flex justify-center">
+				<div className="flex justify-center px-2 py-1 text-xs text-muted-foreground">
 					Used 112.0 MB out of 1 GB
 				</div>
 				<Show when="signed-out">
 					<SignInButton />
 					<SignUpButton>
-						<Button className="bg-muted text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
+						<Button className="h-10 cursor-pointer rounded-full bg-muted px-4 text-sm font-medium text-white sm:h-12 sm:px-5 sm:text-base">
 							{" "}
 							Sign Up
 						</Button>
 					</SignUpButton>
 				</Show>
 				<Show when="signed-in">
-					<UserButton />
+					<DropdownMenu>
+						<DropdownMenuTrigger>
+							<button
+								type="button"
+								className="flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-muted/50"
+							>
+								<Image
+									src={userData.user?.imageUrl ?? ""}
+									height={36}
+									width={36}
+									alt="User avatar"
+									className="rounded-xl object-cover"
+									unoptimized
+								/>
+								<div className="flex flex-col overflow-hidden">
+									<span className="truncate text-sm font-medium">
+										{userData.isLoaded && userData.user
+											? userData.user.fullName
+											: ""}
+									</span>
+									<span className="truncate text-xs text-muted-foreground">
+										{userData.isLoaded && userData.user
+											? userData.user.primaryEmailAddress?.emailAddress
+											: ""}
+									</span>
+								</div>
+							</button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent
+							align="end"
+							className="w-56"
+						></DropdownMenuContent>
+					</DropdownMenu>
 				</Show>
 			</SidebarFooter>
-			{/* <SidebarRail /> */}
+			<SidebarRail />
 		</Sidebar>
 	);
 }
