@@ -7,7 +7,7 @@ export type Node = {
   modified_at: Date
   is_deleted: boolean
   url?: string
-  size?: number | string
+  size?: number 
 }
 
 export type BreadcrumbItem = { id: string | null; name: string }
