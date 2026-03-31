@@ -19,7 +19,6 @@ interface StorageLayoutProps {
 
 export function StorageLayout({
   items,
-  initialFolderId,
   breadcrumbPath,
 }: StorageLayoutProps) {
   const router = useRouter()
@@ -68,7 +67,6 @@ export function StorageLayout({
   const isEmptyState = filteredItems.length === 0 && searchQuery === ""
 
   return (
-    <SidebarInset>
       <div
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -76,8 +74,14 @@ export function StorageLayout({
         onDrop={handleDrop}
         className={`flex-1 overflow-hidden transition-colors ${isDragging ? "bg-accent/10" : ""}`}
       >
-        <div className="sticky top-0 z-40 border-b bg-background">
+        <div className=" border-b bg-background">
           <div className="space-y-4 p-6">
+          {/* <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
+        <SidebarTrigger className="-ml-1" />
+        <Separator
+          orientation="vertical"
+          className="mx-2 data-[orientation=vertical]:h-4"
+        /> */}
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
             <div className="flex items-center justify-between gap-4">
               <BreadcrumbNav
@@ -107,6 +111,5 @@ export function StorageLayout({
           )}
         </div>
       </div>
-    </SidebarInset>
   )
 }
