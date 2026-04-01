@@ -64,9 +64,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<a href="/" className="flex gap-3">
+				<a href="/" className="flex gap-3 group-data-[collapsible=icon]:justify-center">
 					<Cloudy className="size-5!" />
-					<span className="text-base font-semibold text-primary">Chunks</span>
+					<span className="group-data-[collapsible=icon]:hidden text-base font-semibold text-primary">Chunks</span>
 				</a>
 			</SidebarHeader>
 
@@ -115,7 +115,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarContent>
 
 			<SidebarFooter>
-				<div className="flex justify-center px-2 py-1 text-xs text-muted-foreground">
+				<div className="flex justify-center px-2 py-1 text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">
 					Used 112.0 MB out of 1 GB
 				</div>
 				<Show when="signed-out">
@@ -132,14 +132,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						<DropdownMenuTrigger>
 							<button
 								type="button"
-								className="flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-muted/50"
+								className="flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-muted/50 group-data-[collapsible=icon]:p-0"
 							>
 								<Image
 									src={userData.user?.imageUrl ?? ""}
 									height={36}
 									width={36}
 									alt="User avatar"
-									className="rounded-xl object-cover"
+									className="rounded-xl object-cover group-data-[collapsible=icon]:hover:scale-105 transition-transform duration-200"
 									unoptimized
 								/>
 								<div className="flex flex-col overflow-hidden">
