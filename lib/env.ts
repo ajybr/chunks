@@ -9,7 +9,9 @@ const envSchema = z.object({
   SINGLESTORE_PORT: z.string().default("3306"),
   SINGLESTORE_DB_NAME: z.string().default("chunks"),
 
-  NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
+  RABBITMQ_URL: z.string().url(),
+
+  // NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
 
   NODE_ENV: z
     .enum(["development", "test", "production"])
