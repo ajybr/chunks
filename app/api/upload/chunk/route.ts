@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     chunkId = existing[0]!.id
   } else {
     const buffer = await blob.arrayBuffer()
-    const { url } = await put(`chunks/${checksum}`, buffer, { access: "private" })
+    const { url } = await uploadFileToBlobStorage(`chunks/${checksum}`, buffer)
 
     const newChunk = {
       id:         crypto.randomUUID(),

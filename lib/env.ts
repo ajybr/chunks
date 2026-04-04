@@ -10,6 +10,7 @@ const envSchema = z.object({
   SINGLESTORE_DB_NAME: z.string().default("chunks"),
 
   RABBITMQ_URL: z.string().url(),
+  BLOB_STORAGE_CONNECTION_STRING: z.string(),
 
   // NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
 
