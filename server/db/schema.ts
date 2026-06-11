@@ -1,15 +1,14 @@
-import { boolean } from "drizzle-orm/gel-core"
-import { index, int, singlestoreTable, timestamp, varchar } from "drizzle-orm/singlestore-core"
+import { boolean, index, int, singlestoreTable, timestamp, varchar } from "drizzle-orm/singlestore-core"
 
 export const node = singlestoreTable("nodes_table", {
   id:          varchar({ length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   parent_id:   varchar({ length: 36 }),
   owner:       varchar({ length: 255 }).notNull(),
-  // @ts-ignore
   name:        varchar({ length: 255 }).notNull(),
   type:        varchar({ length: 10 }).notNull(),  // "file" | "folder"
   modified_at: timestamp().notNull(),
   is_deleted:  boolean().notNull().default(false),
+  deleted_at:  timestamp(),
 },
 (t) => [
   index("idx_parent").on(t.parent_id),
