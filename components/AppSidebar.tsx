@@ -17,7 +17,7 @@ import {
 	SidebarMenuItem,
 	SidebarRail,
 } from "@/components/ui/sidebar";
-import { Show, SignUpButton, SignInButton, useUser } from "@clerk/nextjs";
+import { SignUpButton, SignInButton, useUser } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import {
 	DropdownMenu,
@@ -64,10 +64,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<a href="/" className="flex gap-3 group-data-[collapsible=icon]:justify-center">
+				<Link href="/" className="flex gap-3 group-data-[collapsible=icon]:justify-center">
 					<Cloudy className="size-5!" />
 					<span className="group-data-[collapsible=icon]:hidden text-base font-semibold text-primary">Chunks</span>
-				</a>
+				</Link>
 			</SidebarHeader>
 
 			<SidebarContent>
@@ -118,16 +118,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<div className="flex justify-center px-2 py-1 text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">
 					Used 112.0 MB out of 1 GB
 				</div>
-				<Show when="signed-out">
-					<SignInButton />
-					<SignUpButton>
-						<Button className="h-10 cursor-pointer rounded-full bg-muted px-4 text-sm font-medium text-white sm:h-12 sm:px-5 sm:text-base">
-							{" "}
-							Sign Up
-						</Button>
-					</SignUpButton>
-				</Show>
-				<Show when="signed-in">
+				{!userData.isSignedIn ? (
+					<>
+						<SignInButton />
+						<SignUpButton>
+							<Button className="h-10 cursor-pointer rounded-full bg-muted px-4 text-sm font-medium text-white sm:h-12 sm:px-5 sm:text-base">
+								{" "}
+								Sign Up
+							</Button>
+						</SignUpButton>
+					</>
+				) : (
 					<DropdownMenu>
 						<DropdownMenuTrigger>
 							<button
@@ -161,7 +162,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 							className="w-56"
 						></DropdownMenuContent>
 					</DropdownMenu>
-				</Show>
+				)}
 			</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>
