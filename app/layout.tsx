@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist_Mono, Inter } from "next/font/google";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -36,7 +36,7 @@ export default function RootLayout({
 				inter.variable,
 			)}
 		>
-			<body className={`${inter.variable} ${fontMono.variable} antialiased`}>
+			<body className={cn("antialiased", fontMono.variable, inter.variable)}>
 				<ClerkProvider>
 					<ThemeProvider>
 						<SidebarProvider>

@@ -6,8 +6,9 @@ export type Node = {
   type: "file" | "folder"
   modified_at: Date
   is_deleted: boolean
+  deleted_at: Date | null
   url?: string
-  size?: number 
+  size?: number
 }
 
 export type BreadcrumbItem = { id: string | null; name: string }
