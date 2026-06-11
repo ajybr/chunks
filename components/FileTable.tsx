@@ -35,6 +35,16 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import type { Node } from "@/lib/types";
 
 interface FileTableProps {
@@ -46,13 +56,17 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
   const router = useRouter();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Node | null>(null);
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string | null | undefined) => {
+    if (!date) return "\u2014";
+    const d = typeof date === "string" ? new Date(date) : date;
+    if (isNaN(d.getTime())) return "\u2014";
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
-    }).format(date);
+    }).format(d);
   };
 
   const formatFileSize = (sizeInKB: number): string => {
@@ -84,16 +98,20 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
         break;
       }
       case "delete": {
-        if (confirm(`Move "${item.name}" to trash?`)) {
-          await fetch(`/api/nodes/${item.id}/delete`, { method: "POST" });
-          router.refresh();
-        }
+        setDeleteTarget(item);
         break;
       }
       default:
         console.log(`[v0] Action "${action}" triggered for item: ${item.id}`);
     }
   };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    await fetch(`/api/nodes/${deleteTarget.id}/delete`, { method: "POST" })
+    setDeleteTarget(null)
+    router.refresh()
+  }
 
   if (items.length === 0) {
     return (
@@ -256,6 +274,25 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
           ))}
         </TableBody>
       </Table>
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Move to trash</AlertDialogTitle>
+            <AlertDialogDescription>
+              Move &ldquo;{deleteTarget?.name}&rdquo; to trash?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Move to trash
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

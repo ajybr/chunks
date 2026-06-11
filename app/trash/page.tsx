@@ -27,6 +27,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog"
 import type { Node } from "@/lib/types"
 
 export default function TrashPage() {
@@ -34,6 +44,7 @@ export default function TrashPage() {
   const [items, setItems] = useState<Node[]>([])
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Node | null>(null)
 
   useEffect(() => {
     async function fetchDeleted() {
@@ -50,12 +61,15 @@ export default function TrashPage() {
     fetchDeleted()
   }, [])
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string | null | undefined) => {
+    if (!date) return "\u2014"
+    const d = typeof date === "string" ? new Date(date) : date
+    if (isNaN(d.getTime())) return "\u2014"
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
-    }).format(date)
+    }).format(d)
   }
 
   const formatFileSize = (sizeInKB: number): string => {
@@ -81,14 +95,18 @@ export default function TrashPage() {
         break
       }
       case "permanent-delete": {
-        if (confirm(`Permanently delete "${item.name}"? This cannot be undone.`)) {
-          await fetch(`/api/nodes/${item.id}/delete`, { method: "POST" })
-          setItems((prev) => prev.filter((i) => i.id !== item.id))
-          router.refresh()
-        }
+        setDeleteTarget(item)
         break
       }
     }
+  }
+
+  const handlePermanentDelete = async () => {
+    if (!deleteTarget) return
+    await fetch(`/api/nodes/${deleteTarget.id}/delete`, { method: "POST" })
+    setItems((prev) => prev.filter((i) => i.id !== deleteTarget.id))
+    setDeleteTarget(null)
+    router.refresh()
   }
 
   if (items.length === 0) {
@@ -198,6 +216,29 @@ export default function TrashPage() {
           ))}
         </TableBody>
       </Table>
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete permanently</AlertDialogTitle>
+            <AlertDialogDescription>
+              Permanently delete &ldquo;{deleteTarget?.name}&rdquo;? This cannot
+              be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={handlePermanentDelete}
+            >
+              Delete permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
