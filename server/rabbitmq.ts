@@ -53,14 +53,18 @@ async function getChannel(): Promise<Channel> {
 }
 
 export async function publish<T extends object>(queue: QueueName, payload: T): Promise<void> {
-  const ch = await getChannel()
-  const sent = ch.sendToQueue(
-    queue,
-    Buffer.from(JSON.stringify(payload)),
-    { persistent: true }
-  )
-  if (!sent) {
-    console.warn(`[rabbitmq] Channel buffer full, message to ${queue} may be dropped`)
+  try {
+    const ch = await getChannel()
+    const sent = ch.sendToQueue(
+      queue,
+      Buffer.from(JSON.stringify(payload)),
+      { persistent: true }
+    )
+    if (!sent) {
+      console.warn(`[rabbitmq] Channel buffer full, message to ${queue} may be dropped`)
+    }
+  } catch (err) {
+    console.error(`[rabbitmq] Failed to publish to ${queue}:`, err)
   }
 }
 

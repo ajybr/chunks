@@ -39,7 +39,11 @@ export async function uploadFile(
     form.append("sequence", String(chunk.index))
     form.append("total_chunks", String(total))
     if (results[chunk.checksum]) {
-      await fetch("/api/upload/chunk", { method: "POST", body: form })
+      const r = await fetch("/api/upload/chunk", { method: "POST", body: form })
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}))
+        throw new Error(err.error ?? `Chunk ref failed (${r.status})`)
+      }
       skipped++
     } else {
       form.append("chunk", chunk.blob)
