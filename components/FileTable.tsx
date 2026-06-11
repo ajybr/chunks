@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   File,
   Folder,
@@ -42,6 +43,7 @@ interface FileTableProps {
 }
 
 export function FileTable({ items, onFolderClick }: FileTableProps) {
+  const router = useRouter();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
@@ -55,17 +57,42 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
 
   const formatFileSize = (sizeInKB: number): string => {
     if (sizeInKB < 1024) return `${sizeInKB} KB`;
-
     const sizeInMB = sizeInKB / 1024;
     if (sizeInMB < 1024) return `${sizeInMB.toFixed(1)} MB`;
-
     const sizeInGB = sizeInMB / 1024;
     return `${sizeInGB.toFixed(1)} GB`;
   };
 
-  const handleMenuAction = (action: string, itemId: string) => {
-    console.log(`[v0] Action "${action}" triggered for item: ${itemId}`);
+  const handleMenuAction = async (action: string, item: Node) => {
     setOpenMenuId(null);
+
+    switch (action) {
+      case "download": {
+        window.open(`/api/nodes/${item.id}/download`, "_blank");
+        break;
+      }
+      case "rename": {
+        const name = prompt("Rename:", item.name);
+        if (name && name !== item.name) {
+          const res = await fetch(`/api/nodes/${item.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name }),
+          });
+          if (res.ok) router.refresh();
+        }
+        break;
+      }
+      case "delete": {
+        if (confirm(`Move "${item.name}" to trash?`)) {
+          await fetch(`/api/nodes/${item.id}/delete`, { method: "POST" });
+          router.refresh();
+        }
+        break;
+      }
+      default:
+        console.log(`[v0] Action "${action}" triggered for item: ${item.id}`);
+    }
   };
 
   if (items.length === 0) {
@@ -150,7 +177,7 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem
                             onClick={() =>
-                              handleMenuAction("download", item.id)
+                              handleMenuAction("download", item)
                             }
                             className="gap-2"
                           >
@@ -158,27 +185,21 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
                             Download
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() =>
-                              handleMenuAction("share", item.id)
-                            }
+                            onClick={() => handleMenuAction("share", item)}
                             className="gap-2"
                           >
                             <Share2 className="h-4 w-4" />
                             Share
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() =>
-                              handleMenuAction("star", item.id)
-                            }
+                            onClick={() => handleMenuAction("star", item)}
                             className="gap-2"
                           >
                             <Star className="h-4 w-4" />
                             Star
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() =>
-                              handleMenuAction("rename", item.id)
-                            }
+                            onClick={() => handleMenuAction("rename", item)}
                             className="gap-2"
                           >
                             <Edit className="h-4 w-4" />
@@ -187,9 +208,7 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             variant="destructive"
-                            onClick={() =>
-                              handleMenuAction("delete", item.id)
-                            }
+                            onClick={() => handleMenuAction("delete", item)}
                             className="gap-2"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -203,21 +222,21 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
               </ContextMenuTrigger>
               <ContextMenuContent className="w-48">
                 <ContextMenuItem
-                  onClick={() => handleMenuAction("download", item.id)}
+                  onClick={() => handleMenuAction("download", item)}
                   className="gap-2"
                 >
                   <Download className="h-4 w-4" />
                   Download
                 </ContextMenuItem>
                 <ContextMenuItem
-                  onClick={() => handleMenuAction("share", item.id)}
+                  onClick={() => handleMenuAction("share", item)}
                   className="gap-2"
                 >
                   <Share2 className="h-4 w-4" />
                   Share
                 </ContextMenuItem>
                 <ContextMenuItem
-                  onClick={() => handleMenuAction("rename", item.id)}
+                  onClick={() => handleMenuAction("rename", item)}
                   className="gap-2"
                 >
                   <Edit className="h-4 w-4" />
@@ -226,7 +245,7 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
                 <ContextMenuSeparator />
                 <ContextMenuItem
                   variant="destructive"
-                  onClick={() => handleMenuAction("delete", item.id)}
+                  onClick={() => handleMenuAction("delete", item)}
                   className="gap-2"
                 >
                   <Trash2 className="h-4 w-4" />

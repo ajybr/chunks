@@ -2,8 +2,9 @@
 
 import { useState, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { CloudUpload } from "lucide-react"
+import { CloudUpload, FolderPlus } from "lucide-react"
 import { useUser } from "@clerk/nextjs"
+import { Button } from "@/components/ui/button"
 import { SearchBar } from "./SearchBar"
 import { BreadcrumbNav } from "@/components/BreadcrumbNav"
 import { UploadButton } from "@/components/UploadButton"
@@ -28,6 +29,7 @@ export function StorageLayout({
   const [isDragging, setIsDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState("")
+  const [uploadPercent, setUploadPercent] = useState(0)
   const dragCounterRef = useRef(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -43,6 +45,24 @@ export function StorageLayout({
       router.push(`/folder/${target.id}`)
     }
   }
+
+  const handleNewFolder = useCallback(async () => {
+    const name = prompt("Folder name:")
+    if (!name) return
+    try {
+      const res = await fetch("/api/folders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          parent_id: _initialFolderId ?? null,
+        }),
+      })
+      if (res.ok) router.refresh()
+    } catch (err) {
+      console.error("Failed to create folder:", err)
+    }
+  }, [_initialFolderId, router])
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -65,10 +85,12 @@ export function StorageLayout({
     async (files: FileList | File[]) => {
       if (!isLoaded || !user) return
       setUploading(true)
+      setUploadPercent(0)
 
       for (const file of Array.from(files)) {
         try {
           setUploadProgress(`Creating entry for ${file.name}...`)
+          setUploadPercent(0)
           const nodeRes = await fetch("/api/nodes", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -89,20 +111,27 @@ export function StorageLayout({
 
           setUploadProgress(`Uploading ${file.name}...`)
           await uploadFile(file, nodeId, (progress) => {
+            const pct = Math.round(
+              ((progress.uploaded + progress.skipped) / progress.total) * 100
+            )
+            setUploadPercent(pct)
             setUploadProgress(
               `${file.name}: ${progress.uploaded + progress.skipped}/${progress.total} chunks`
             )
           })
 
           setUploadProgress(`${file.name} uploaded successfully`)
+          setUploadPercent(100)
         } catch (err) {
           console.error(`Upload failed for ${file.name}:`, err)
           setUploadProgress(`Failed to upload ${file.name}`)
+          setUploadPercent(0)
         }
       }
 
       setUploading(false)
       setUploadProgress("")
+      setUploadPercent(0)
       router.refresh()
     },
     [isLoaded, user, _initialFolderId, router]
@@ -158,10 +187,29 @@ export function StorageLayout({
               path={breadcrumbPath}
               onNavigate={handleBreadcrumbNavigate}
             />
-            <UploadButton onClick={handleUploadClick} disabled={uploading} />
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={handleNewFolder}
+              >
+                <FolderPlus className="h-4 w-4" />
+                New Folder
+              </Button>
+              <UploadButton onClick={handleUploadClick} disabled={uploading} />
+            </div>
           </div>
-          {uploadProgress && (
-            <p className="text-sm text-muted-foreground">{uploadProgress}</p>
+          {uploading && (
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">{uploadProgress}</p>
+              <div className="h-2 w-full rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-300"
+                  style={{ width: `${uploadPercent}%` }}
+                />
+              </div>
+            </div>
           )}
         </div>
       </div>
