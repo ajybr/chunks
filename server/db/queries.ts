@@ -39,7 +39,7 @@ export async function getBreadcrumbPath(
   folderId: string,
   owner: string
 ): Promise<BreadcrumbItem[]> {
-  const rows = await db.execute(sql`
+  const [rows] = await db.execute(sql`
     WITH RECURSIVE ancestors AS (
       SELECT id, name, parent_id, 0 as depth
       FROM nodes_table

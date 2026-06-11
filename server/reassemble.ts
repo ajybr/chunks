@@ -1,13 +1,36 @@
 import { db } from "@/server/db"
 import { chunkRefs, chunks, fileMetadata } from "@/server/db/schema"
 import { eq, asc } from "drizzle-orm"
+import crypto from "crypto"
+import { BlobServiceClient } from "@azure/storage-blob"
+import { env } from "@/lib/env"
+
+const containerName = "chunks"
+
+let blobServiceClient: BlobServiceClient | null = null
+
+function getClient(): BlobServiceClient {
+  if (!blobServiceClient) {
+    blobServiceClient = BlobServiceClient.fromConnectionString(
+      env.BLOB_STORAGE_CONNECTION_STRING
+    )
+  }
+  return blobServiceClient
+}
+
+async function downloadChunk(checksum: string): Promise<Buffer> {
+  const client = getClient()
+  const containerClient = client.getContainerClient(containerName)
+  const blockBlobClient = containerClient.getBlockBlobClient(
+    `chunks/${checksum}`
+  )
+  return await blockBlobClient.downloadToBuffer()
+}
 
 export async function reassembleFile(nodeId: string): Promise<Blob> {
-  // get chunks in sequence order
   const refs = await db
     .select({
       sequence: chunkRefs.sequence,
-      url:      chunks.url,
       checksum: chunks.checksum,
     })
     .from(chunkRefs)
@@ -17,29 +40,21 @@ export async function reassembleFile(nodeId: string): Promise<Blob> {
 
   if (refs.length === 0) throw new Error(`No chunks found for node ${nodeId}`)
 
-  // download all chunks in parallel
-  const buffers = await Promise.all(
+  const chunkBuffers = await Promise.all(
     refs.map(async (ref) => {
-      const res = await fetch(ref.url)
-      if (!res.ok) throw new Error(`Failed to fetch chunk ${ref.sequence}: ${ref.url}`)
+      const buf = await downloadChunk(ref.checksum)
 
-      const buffer   = await res.arrayBuffer()
-
-      // verify integrity — recompute hash and compare
-      const hash     = await crypto.subtle.digest("SHA-256", buffer)
-      const computed = Array.from(new Uint8Array(hash))
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("")
+      const hashBuf = crypto.createHash("sha256").update(buf).digest()
+      const computed = hashBuf.toString("hex")
 
       if (computed !== ref.checksum) {
         throw new Error(`Chunk ${ref.sequence} integrity check failed`)
       }
 
-      return buffer
+      return buf
     })
   )
 
-  // mime type from metadata
   const meta = await db
     .select({ mime_type: fileMetadata.mime_type })
     .from(fileMetadata)
@@ -48,6 +63,6 @@ export async function reassembleFile(nodeId: string): Promise<Blob> {
 
   const mimeType = meta[0]?.mime_type ?? "application/octet-stream"
 
-  // concatenate all buffers into one Blob
-  return new Blob(buffers, { type: mimeType })
+  const blobParts = chunkBuffers.map((b) => new Uint8Array(b))
+  return new Blob(blobParts, { type: mimeType })
 }
