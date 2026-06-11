@@ -4,10 +4,17 @@ import { useState, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { CloudUpload, FolderPlus } from "lucide-react"
 import { useUser } from "@clerk/nextjs"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import {
+  ProgressRoot,
+  ProgressTrack,
+  ProgressIndicator,
+} from "@/components/ui/progress"
 import { SearchBar } from "./SearchBar"
 import { BreadcrumbNav } from "@/components/BreadcrumbNav"
 import { UploadButton } from "@/components/UploadButton"
+import { NewFolderDialog } from "@/components/NewFolderDialog"
 import { FileTable } from "./FileTable"
 import { type Node, type BreadcrumbItem } from "@/lib/types"
 import { uploadFile } from "@/server/upload"
@@ -46,23 +53,7 @@ export function StorageLayout({
     }
   }
 
-  const handleNewFolder = useCallback(async () => {
-    const name = prompt("Folder name:")
-    if (!name) return
-    try {
-      const res = await fetch("/api/folders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          parent_id: _initialFolderId ?? null,
-        }),
-      })
-      if (res.ok) router.refresh()
-    } catch (err) {
-      console.error("Failed to create folder:", err)
-    }
-  }, [_initialFolderId, router])
+
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -84,10 +75,32 @@ export function StorageLayout({
   const processFiles = useCallback(
     async (files: FileList | File[]) => {
       if (!isLoaded || !user) return
+      const fileList = Array.from(files)
+      const totalFiles = fileList.length
+      let filesDone = 0
+
       setUploading(true)
       setUploadPercent(0)
 
-      for (const file of Array.from(files)) {
+      const progressId = toast.custom(
+        () => (
+          <div className="flex flex-col gap-2 w-72">
+            <p className="text-sm font-medium">
+              Uploading 0/{totalFiles} files
+            </p>
+            <ProgressRoot value={0}>
+              <ProgressTrack>
+                <ProgressIndicator style={{ width: "0%" }} />
+              </ProgressTrack>
+            </ProgressRoot>
+          </div>
+        ),
+        { duration: Infinity, position: "bottom-right" }
+      )
+
+      let overallPercent = 0
+
+      for (const file of fileList) {
         try {
           setUploadProgress(`Creating entry for ${file.name}...`)
           setUploadPercent(0)
@@ -111,24 +124,56 @@ export function StorageLayout({
 
           setUploadProgress(`Uploading ${file.name}...`)
           await uploadFile(file, nodeId, (progress) => {
-            const pct = Math.round(
-              ((progress.uploaded + progress.skipped) / progress.total) * 100
+            const filePct =
+              progress.total > 0
+                ? Math.round(
+                    ((progress.uploaded + progress.skipped) / progress.total) *
+                      100
+                  )
+                : 0
+            overallPercent = Math.round(
+              ((filesDone + filePct / 100) / totalFiles) * 100
             )
-            setUploadPercent(pct)
+            setUploadPercent(overallPercent)
             setUploadProgress(
               `${file.name}: ${progress.uploaded + progress.skipped}/${progress.total} chunks`
             )
+            toast.custom(
+              () => (
+                <div className="flex flex-col gap-2 w-72">
+                  <p className="text-sm font-medium">
+                    Uploading {filesDone}/{totalFiles} files &middot;{" "}
+                    {progress.uploaded + progress.skipped}/{progress.total}{" "}
+                    chunks
+                  </p>
+                  <ProgressRoot value={overallPercent}>
+                    <ProgressTrack>
+                      <ProgressIndicator
+                        style={{ width: `${overallPercent}%` }}
+                      />
+                    </ProgressTrack>
+                  </ProgressRoot>
+                </div>
+              ),
+              { id: progressId, duration: Infinity, position: "bottom-right" }
+            )
           })
 
-          setUploadProgress(`${file.name} uploaded successfully`)
-          setUploadPercent(100)
+          filesDone++
+          toast.success(`${file.name} uploaded successfully`, {
+            position: "bottom-right",
+          })
         } catch (err) {
-          console.error(`Upload failed for ${file.name}:`, err)
+          const msg = err instanceof Error ? err.message : "Upload failed"
+          toast.error(`${file.name}: ${msg}`, {
+            position: "bottom-right",
+          })
           setUploadProgress(`Failed to upload ${file.name}`)
           setUploadPercent(0)
         }
       }
 
+      toast.dismiss(progressId)
       setUploading(false)
       setUploadProgress("")
       setUploadPercent(0)
@@ -188,27 +233,27 @@ export function StorageLayout({
               onNavigate={handleBreadcrumbNavigate}
             />
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={handleNewFolder}
-              >
-                <FolderPlus className="h-4 w-4" />
-                New Folder
-              </Button>
+              <NewFolderDialog parentId={_initialFolderId}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
+                  <FolderPlus className="h-4 w-4" />
+                  New Folder
+                </Button>
+              </NewFolderDialog>
               <UploadButton onClick={handleUploadClick} disabled={uploading} />
             </div>
           </div>
           {uploading && (
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">{uploadProgress}</p>
-              <div className="h-2 w-full rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-300"
-                  style={{ width: `${uploadPercent}%` }}
-                />
-              </div>
+              <ProgressRoot value={uploadPercent}>
+                <ProgressTrack>
+                  <ProgressIndicator style={{ width: `${uploadPercent}%` }} />
+                </ProgressTrack>
+              </ProgressRoot>
             </div>
           )}
         </div>
