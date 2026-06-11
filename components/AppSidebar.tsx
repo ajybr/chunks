@@ -77,36 +77,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						<SidebarMenu>
 							{navItems.map((item) => (
 								<SidebarMenuItem className="flex items-center" key={item.title}>
-									<SidebarMenuButton tooltip={item.title}>
-										{item.disabled ? (
-											<button
-												type="button"
-												disabled
-												className="flex w-full items-center gap-2"
-											>
-												<item.icon className="h-4 w-4" />
-												<span>{item.title}</span>
-												{item.badge && (
-													<span className="ml-auto rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
-														{item.badge}
-													</span>
-												)}
-											</button>
-										) : (
-											<Link
-												href={item.url}
-												className="flex w-full items-center gap-2"
-											>
-												<item.icon className="h-4 w-4" />
-												<span>{item.title}</span>
-												{item.badge && (
-													<span className="ml-auto rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
-														{item.badge}
-													</span>
-												)}
-											</Link>
-										)}
-									</SidebarMenuButton>
+									{item.disabled ? (
+										<SidebarMenuButton tooltip={item.title} disabled className="opacity-50 cursor-not-allowed">
+											<item.icon className="h-4 w-4" />
+											<span>{item.title}</span>
+											{item.badge && (
+												<span className="ml-auto rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+													{item.badge}
+												</span>
+											)}
+										</SidebarMenuButton>
+									) : (
+										<SidebarMenuButton tooltip={item.title} render={<Link href={item.url} />}>
+											<item.icon className="h-4 w-4" />
+											<span>{item.title}</span>
+											{item.badge && (
+												<span className="ml-auto rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+													{item.badge}
+												</span>
+											)}
+										</SidebarMenuButton>
+									)}
 								</SidebarMenuItem>
 							))}
 						</SidebarMenu>
