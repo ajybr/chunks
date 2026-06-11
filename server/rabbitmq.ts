@@ -1,4 +1,4 @@
-import amqp, { type Channel, type Connection } from "amqplib"
+import amqp, { type Channel, type ChannelModel } from "amqplib"
 import { env } from "@/lib/env"
 
 export const QUEUES = {
@@ -24,7 +24,7 @@ export type FileAssembledPayload = {
   mime_type: string
 }
 
-let connection: Connection | null = null
+let connection: ChannelModel | null = null
 let channel:    Channel    | null = null
 
 async function getChannel(): Promise<Channel> {
@@ -33,24 +33,35 @@ async function getChannel(): Promise<Channel> {
   connection = await amqp.connect(env.RABBITMQ_URL)
   channel    = await connection.createChannel()
 
-  // Assert all queues 
+  // Assert all queues
   for (const queue of Object.values(QUEUES)) {
     await channel.assertQueue(queue, { durable: true })
   }
 
   // Reconnect on unexpected close
-  connection.on("close", () => { connection = null; channel = null })
+  connection.on("close", () => {
+    connection = null
+    channel = null
+  })
+  connection.on("error", (err) => {
+    console.error("[rabbitmq] Connection error:", err)
+    connection = null
+    channel = null
+  })
 
   return channel
 }
 
 export async function publish<T extends object>(queue: QueueName, payload: T): Promise<void> {
   const ch = await getChannel()
-  ch.sendToQueue(
+  const sent = ch.sendToQueue(
     queue,
     Buffer.from(JSON.stringify(payload)),
-    { persistent: true }  // survives RabbitMQ restart
+    { persistent: true }
   )
+  if (!sent) {
+    console.warn(`[rabbitmq] Channel buffer full, message to ${queue} may be dropped`)
+  }
 }
 
 export async function consume<T extends object>(
