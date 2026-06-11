@@ -2,6 +2,7 @@ import { Geist_Mono, Inter } from "next/font/google";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -43,6 +44,7 @@ export default function RootLayout({
 							<AppSidebar variant="inset" />
 							<SidebarInset> {children}</SidebarInset>
 						</SidebarProvider>
+						<Toaster position="bottom-right" />
 					</ThemeProvider>
 				</ClerkProvider>
 			</body>
