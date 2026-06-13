@@ -32,8 +32,6 @@ const navItems = [
     title: "Favorites",
     url: "/favorites",
     icon: Star,
-    badge: "coming soon",
-    disabled: true,
   },
   {
     title: "Shared",
@@ -46,6 +44,8 @@ const navItems = [
     title: "Images",
     url: "/images",
     icon: FileImage,
+    badge: "coming soon",
+    disabled: true,
   },
   {
     title: "Trash",
