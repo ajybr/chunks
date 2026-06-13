@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Cloudy, HardDrive, Shield, Share2 } from "lucide-react"
+import Folder from "@/components/Folder"
 
 const features = [
   {
@@ -26,31 +27,21 @@ const features = [
 export default function LandingPage() {
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="flex items-center justify-between px-6 py-4 sm:px-10">
-        <Link href="/" className="flex items-center gap-2 text-sm font-medium">
-          <Cloudy className="size-5" />
-          <span className="font-semibold tracking-tight">chunks</span>
+      <header className="flex justify-center px-6 py-6 sm:px-10">
+        <Link href="/" className="flex items-center gap-2">
+          <Cloudy className="size-6 text-white" />
+          <span className="text-xl font-semibold text-primary">Chunks</span>
         </Link>
-        <nav className="flex items-center gap-3">
-          <Link href="/home">
-            <Button variant="ghost" size="sm">Sign in</Button>
-          </Link>
-          <Link href="/home">
-            <Button size="sm">Get Started</Button>
-          </Link>
-        </nav>
       </header>
 
       <main className="flex flex-1 flex-col">
-        <section className="flex flex-col items-center px-6 py-24 text-center sm:px-10 sm:py-32">
+        <section className="flex h-screen flex-col items-center justify-center px-6 text-center sm:px-10">
+          <div className="mb-16">
+            <Folder size={2} color="#f6ece9" />
+          </div>
           <h1 className="max-w-3xl text-balance text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
-            Your files, broken into pieces
+            better file uploads for all
           </h1>
-          <p className="mt-4 max-w-xl text-balance text-base text-muted-foreground sm:text-lg">
-            chunks is a distributed file storage service that splits your files
-            into encrypted chunks, deduplicates by content, and stores them
-            across a scalable backend.
-          </p>
           <div className="mt-8 flex items-center gap-4">
             <Link href="/home">
               <Button size="lg">Get Started</Button>
