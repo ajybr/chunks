@@ -1,4 +1,4 @@
-import { Geist_Mono, Inter } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -6,8 +6,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -40,10 +38,7 @@ export default function RootLayout({
 			<body className={cn("antialiased", fontMono.variable, inter.variable)}>
 				<ClerkProvider>
 					<ThemeProvider>
-						<SidebarProvider>
-							<AppSidebar variant="inset" />
-							<SidebarInset> {children}</SidebarInset>
-						</SidebarProvider>
+						{children}
 						<Toaster position="bottom-right" />
 					</ThemeProvider>
 				</ClerkProvider>

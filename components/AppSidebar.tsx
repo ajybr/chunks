@@ -30,7 +30,7 @@ import Image from "next/image";
 const navItems = [
   {
     title: "Home",
-    url: "/",
+    url: "/home",
     icon: House,
   },
   {
@@ -89,7 +89,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <Link href="/" className="flex gap-3 group-data-[collapsible=icon]:justify-center">
+        <Link href="/home" className="flex gap-3 group-data-[collapsible=icon]:justify-center">
           <Cloudy className="size-5!" />
           <span className="group-data-[collapsible=icon]:hidden text-base font-semibold text-primary">Chunks</span>
         </Link>

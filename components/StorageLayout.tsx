@@ -47,7 +47,7 @@ export function StorageLayout({
   const handleBreadcrumbNavigate = (index: number) => {
     const target = breadcrumbPath[index]
     if (target.id === null) {
-      router.push("/")
+      router.push("/home")
     } else {
       router.push(`/folder/${target.id}`)
     }
