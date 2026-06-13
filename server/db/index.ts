@@ -4,4 +4,4 @@ import mysql from "mysql2/promise"
 
 const poolConnection = mysql.createPool(env.DATABASE_URL)
 
-export const db = drizzle({ client: poolConnection })
+export const db = drizzle(poolConnection as never)

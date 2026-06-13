@@ -1,4 +1,4 @@
-import { boolean, index, int, singlestoreTable, timestamp, varchar } from "drizzle-orm/singlestore-core"
+import { boolean, index, int, bigint, singlestoreTable, timestamp, varchar } from "drizzle-orm/singlestore-core"
 
 export const node = singlestoreTable("nodes_table", {
   id:          varchar({ length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -18,7 +18,7 @@ export const node = singlestoreTable("nodes_table", {
 export const fileMetadata = singlestoreTable("file_metadata_table", {
   node_id:   varchar({ length: 36 }).primaryKey(),  
   url:       varchar({ length: 255 }).notNull(),     
-  size:      int().notNull(),                       
+  size:      bigint({ unsigned: true, mode: "number" }).notNull(),                       
   mime_type: varchar({ length: 127 }).notNull(),     
 })
 
