@@ -18,14 +18,9 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { SignUpButton, SignInButton, useUser } from "@clerk/nextjs";
+import { SignUpButton, SignInButton, useUser, UserButton } from "@clerk/nextjs";
 import { Button } from "./ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import Image from "next/image";
+
 
 const navItems = [
   {
@@ -153,39 +148,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SignUpButton>
           </>
         ) : (
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <button
-                type="button"
-                className="flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-muted/50 group-data-[collapsible=icon]:p-0"
-              >
-                <Image
-                  src={userData.user?.imageUrl ?? ""}
-                  height={36}
-                  width={36}
-                  alt="User avatar"
-                  className="rounded-xl object-cover group-data-[collapsible=icon]:hover:scale-105 transition-transform duration-200"
-                  unoptimized
-                />
-                <div className="flex flex-col overflow-hidden">
-                  <span className="truncate text-sm font-medium">
-                    {userData.isLoaded && userData.user
-                      ? userData.user.fullName
-                      : ""}
-                  </span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    {userData.isLoaded && userData.user
-                      ? userData.user.primaryEmailAddress?.emailAddress
-                      : ""}
-                  </span>
-                </div>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-56"
-            ></DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex w-full items-center gap-3 rounded-lg p-2 group-data-[collapsible=icon]:justify-center">
+            <UserButton userProfileMode="modal" />
+            <div className="flex flex-col overflow-hidden group-data-[collapsible=icon]:hidden">
+              <span className="truncate text-sm font-medium">
+                {userData.isLoaded && userData.user
+                  ? userData.user.fullName
+                  : ""}
+              </span>
+              <span className="truncate text-xs text-muted-foreground">
+                {userData.isLoaded && userData.user
+                  ? userData.user.primaryEmailAddress?.emailAddress
+                  : ""}
+              </span>
+            </div>
+          </div>
         )}
       </SidebarFooter>
       <SidebarRail />
