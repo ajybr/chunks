@@ -105,6 +105,18 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
         }
         break;
       }
+      case "star": {
+        try {
+          const res = await fetch(`/api/nodes/${item.id}/star`, { method: "POST" })
+          if (!res.ok) throw new Error("Failed to toggle star")
+          const data = await res.json()
+          toast.success(data.is_favorite ? "Added to favorites" : "Removed from favorites", { position: "bottom-right" })
+          router.refresh()
+        } catch (err) {
+          toast.error(err instanceof Error ? err.message : "Failed to star item", { position: "bottom-right" })
+        }
+        break
+      }
       case "delete": {
         setDeleteTarget(item);
         break;
@@ -177,6 +189,9 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
                     <File className="h-5 w-5 text-blue-500" />
                   )}
                   {item.name}
+                  {item.is_favorite && (
+                    <Star className="h-3 w-3 fill-amber-400 text-amber-400 ml-1.5 self-center" />
+                  )}
                 </TableCell>
                 <TableCell className="py-4 align-middle text-sm text-muted-foreground">
                   {user?.fullName ?? item.owner}
@@ -228,8 +243,8 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
                           onClick={(e) => handleMenuAction(e, "star", item)}
                           className="gap-2"
                         >
-                          <Star className="h-4 w-4" />
-                          Star
+                          <Star className={`h-4 w-4 ${item.is_favorite ? "fill-amber-400 text-amber-400" : ""}`} />
+                          {item.is_favorite ? "Starred" : "Star"}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={(e) => handleMenuAction(e, "rename", item)}
@@ -263,11 +278,11 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
                   </ContextMenuItem>
                 )}
                 <ContextMenuItem
-                  onClick={(e) => handleMenuAction(e, "share", item)}
+                  onClick={(e) => handleMenuAction(e, "star", item)}
                   className="gap-2"
                 >
-                  <Share2 className="h-4 w-4" />
-                  Share
+                  <Star className={`h-4 w-4 ${item.is_favorite ? "fill-amber-400 text-amber-400" : ""}`} />
+                  {item.is_favorite ? "Starred" : "Star"}
                 </ContextMenuItem>
                 <ContextMenuItem
                   onClick={(e) => handleMenuAction(e, "rename", item)}
