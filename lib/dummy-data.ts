@@ -11,6 +11,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-01-01"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440002",
@@ -21,6 +23,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-10-15"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440003",
@@ -31,6 +35,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-11-20"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440004",
@@ -41,6 +47,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-12-01"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440005",
@@ -51,6 +59,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-11-10"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440006",
@@ -61,6 +71,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-12-05"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440007",
@@ -71,6 +83,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-09-01"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440008",
@@ -81,6 +95,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-12-10"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440009",
@@ -91,6 +107,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-12-15"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   // Files
   {
@@ -102,6 +120,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-08-20"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440102",
@@ -112,6 +132,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-10-12"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440103",
@@ -122,6 +144,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-07-15"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440104",
@@ -132,6 +156,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-06-01"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440105",
@@ -142,6 +168,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-12-14"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440106",
@@ -152,6 +180,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-11-30"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440107",
@@ -162,6 +192,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-12-08"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440108",
@@ -172,6 +204,8 @@ export const mockItems: Node[] = [
     modified_at: new Date("2024-12-06"),
     is_deleted: false,
     deleted_at: null,
+    is_favorite: false,
+    favorited_at: null,
   },
 ]
 

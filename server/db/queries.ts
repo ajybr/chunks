@@ -13,6 +13,8 @@ export function getChildren(node_id: string | null, owner: string) {
       modified_at: node.modified_at,
       is_deleted: node.is_deleted,
       deleted_at: node.deleted_at,
+      is_favorite: node.is_favorite,
+      favorited_at: node.favorited_at,
       owner: node.owner,
       url: fileMetadata.url,
       size: fileMetadata.size,
@@ -33,6 +35,31 @@ export function getChildren(node_id: string | null, owner: string) {
       sql`CASE WHEN ${node.type} = 'folder' THEN -1 ELSE 1 END`,
       asc(node.name)
     )
+}
+
+export async function getFavorites(owner: string) {
+  return db
+    .select({
+      id: node.id,
+      name: node.name,
+      type: node.type,
+      parent_id: node.parent_id,
+      modified_at: node.modified_at,
+      is_deleted: node.is_deleted,
+      deleted_at: node.deleted_at,
+      is_favorite: node.is_favorite,
+      favorited_at: node.favorited_at,
+      owner: node.owner,
+      url: fileMetadata.url,
+      size: fileMetadata.size,
+      mime_type: fileMetadata.mime_type,
+      item_count: folderMetadata.item_count,
+    })
+    .from(node)
+    .leftJoin(fileMetadata, eq(node.id, fileMetadata.node_id))
+    .leftJoin(folderMetadata, eq(node.id, folderMetadata.node_id))
+    .where(and(eq(node.owner, owner), eq(node.is_favorite, true), eq(node.is_deleted, false)))
+    .orderBy(asc(node.name))
 }
 
 export async function getBreadcrumbPath(
@@ -69,6 +96,8 @@ export async function getDeleted(owner: string) {
       modified_at: node.modified_at,
       is_deleted: node.is_deleted,
       deleted_at: node.deleted_at,
+      is_favorite: node.is_favorite,
+      favorited_at: node.favorited_at,
       owner: node.owner,
       url: fileMetadata.url,
       size: fileMetadata.size,

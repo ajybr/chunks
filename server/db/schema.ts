@@ -9,6 +9,8 @@ export const node = singlestoreTable("nodes_table", {
   modified_at: timestamp().notNull(),
   is_deleted:  boolean().notNull().default(false),
   deleted_at:  timestamp(),
+  is_favorite:  boolean().notNull().default(false),
+  favorited_at: timestamp(),
 },
 (t) => [
   index("idx_parent").on(t.parent_id),

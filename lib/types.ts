@@ -7,6 +7,8 @@ export type Node = {
   modified_at: Date
   is_deleted: boolean
   deleted_at: Date | null
+  is_favorite: boolean
+  favorited_at: Date | null
   url?: string
   size?: number
 }

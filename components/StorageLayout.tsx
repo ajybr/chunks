@@ -35,8 +35,6 @@ export function StorageLayout({
   const [searchQuery, setSearchQuery] = useState("")
   const [isDragging, setIsDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState("")
-  const [uploadPercent, setUploadPercent] = useState(0)
   const dragCounterRef = useRef(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -80,7 +78,6 @@ export function StorageLayout({
       let filesDone = 0
 
       setUploading(true)
-      setUploadPercent(0)
 
       const progressId = toast.custom(
         () => (
@@ -102,8 +99,6 @@ export function StorageLayout({
 
       for (const file of fileList) {
         try {
-          setUploadProgress(`Creating entry for ${file.name}...`)
-          setUploadPercent(0)
           const nodeRes = await fetch("/api/nodes", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -122,7 +117,6 @@ export function StorageLayout({
 
           const { id: nodeId } = await nodeRes.json()
 
-          setUploadProgress(`Uploading ${file.name}...`)
           await uploadFile(file, nodeId, (progress) => {
             const filePct =
               progress.total > 0
@@ -133,10 +127,6 @@ export function StorageLayout({
                 : 0
             overallPercent = Math.round(
               ((filesDone + filePct / 100) / totalFiles) * 100
-            )
-            setUploadPercent(overallPercent)
-            setUploadProgress(
-              `${file.name}: ${progress.uploaded + progress.skipped}/${progress.total} chunks`
             )
             toast.custom(
               () => (
@@ -168,15 +158,11 @@ export function StorageLayout({
           toast.error(`${file.name}: ${msg}`, {
             position: "bottom-right",
           })
-          setUploadProgress(`Failed to upload ${file.name}`)
-          setUploadPercent(0)
         }
       }
 
       toast.dismiss(progressId)
       setUploading(false)
-      setUploadProgress("")
-      setUploadPercent(0)
       router.refresh()
     },
     [isLoaded, user, _initialFolderId, router]
@@ -246,16 +232,6 @@ export function StorageLayout({
               <UploadButton onClick={handleUploadClick} disabled={uploading} />
             </div>
           </div>
-          {uploading && (
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">{uploadProgress}</p>
-              <ProgressRoot value={uploadPercent}>
-                <ProgressTrack>
-                  <ProgressIndicator style={{ width: `${uploadPercent}%` }} />
-                </ProgressTrack>
-              </ProgressRoot>
-            </div>
-          )}
         </div>
       </div>
 
