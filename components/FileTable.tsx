@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import {
   File,
   Folder,
@@ -34,7 +35,8 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -45,6 +47,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import type { Node } from "@/lib/types";
 
 interface FileTableProps {
@@ -54,6 +57,7 @@ interface FileTableProps {
 
 export function FileTable({ items, onFolderClick }: FileTableProps) {
   const router = useRouter();
+  const { user } = useUser();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Node | null>(null);
@@ -69,15 +73,19 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
     }).format(d);
   };
 
-  const formatFileSize = (sizeInKB: number): string => {
-    if (sizeInKB < 1024) return `${sizeInKB} KB`;
-    const sizeInMB = sizeInKB / 1024;
-    if (sizeInMB < 1024) return `${sizeInMB.toFixed(1)} MB`;
-    const sizeInGB = sizeInMB / 1024;
-    return `${sizeInGB.toFixed(1)} GB`;
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    const kb = bytes / 1024;
+    if (kb < 1024) return `${kb.toFixed(1)} KB`;
+    const mb = kb / 1024;
+    if (mb < 1024) return `${mb.toFixed(1)} MB`;
+    const gb = mb / 1024;
+    return `${gb.toFixed(1)} GB`;
   };
 
-  const handleMenuAction = async (action: string, item: Node) => {
+  const handleMenuAction = async (e: React.MouseEvent, action: string, item: Node) => {
+    e.stopPropagation();
+    e.preventDefault();
     setOpenMenuId(null);
 
     switch (action) {
@@ -108,9 +116,15 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return
-    await fetch(`/api/nodes/${deleteTarget.id}/delete`, { method: "POST" })
-    setDeleteTarget(null)
-    router.refresh()
+    try {
+      const res = await fetch(`/api/nodes/${deleteTarget.id}/delete`, { method: "POST" })
+      if (!res.ok) throw new Error("Failed to move to trash")
+      toast.success("Moved to trash", { position: "bottom-right" })
+      setDeleteTarget(null)
+      router.refresh()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to move to trash", { position: "bottom-right" })
+    }
   }
 
   if (items.length === 0) {
@@ -140,121 +154,123 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
         <TableBody>
           {items.map((item) => (
             <ContextMenu key={item.id}>
-              <ContextMenuTrigger>
-                <TableRow
-                  onClick={() => {
-                    if (item.type === "folder") {
-                      onFolderClick?.(item.id);
-                    } else if (item.url) {
-                      window.open(item.url, "_blank");
-                    }
-                  }}
-                  onMouseEnter={() => setHoveredId(item.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  className="cursor-pointer transition-colors hover:bg-muted/50"
-                >
-                  <TableCell className="py-4 flex gap-3 align-middle font-medium">
-                    {item.type === "folder" ? (
-                      <Folder className="h-5 w-5 text-amber-500" />
-                    ) : (
-                      <File className="h-5 w-5 text-blue-500" />
-                    )}
-                    {item.name}
-                  </TableCell>
-                  <TableCell className="py-4 align-middle text-sm text-muted-foreground">
-                    {item.owner}
-                  </TableCell>
-                  <TableCell className="py-4 align-middle text-sm text-muted-foreground">
-                    {item.type === "folder"
-                      ? "\u2014"
-                      : formatFileSize(item.size ?? 0)}
-                  </TableCell>
-                  <TableCell className="py-4 align-middle text-sm text-muted-foreground">
-                    {formatDate(item.modified_at)}
-                  </TableCell>
-                  <TableCell>
-                    {hoveredId === item.id && (
-                      <DropdownMenu
-                        open={openMenuId === item.id}
-                        onOpenChange={(open) =>
-                          setOpenMenuId(open ? item.id : null)
-                        }
-                      >
+              <ContextMenuTrigger
+                render={
+                  <TableRow
+                    onClick={() => {
+                      if (item.type === "folder") {
+                        onFolderClick?.(item.id);
+                      } else if (item.url) {
+                        window.open(item.url, "_blank");
+                      }
+                    }}
+                    onMouseEnter={() => setHoveredId(item.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                    className="cursor-pointer transition-colors hover:bg-muted/50"
+                  />
+                }
+              >
+                <TableCell className="py-4 flex gap-3 align-middle font-medium">
+                  {item.type === "folder" ? (
+                    <Folder className="h-5 w-5 text-amber-500" />
+                  ) : (
+                    <File className="h-5 w-5 text-blue-500" />
+                  )}
+                  {item.name}
+                </TableCell>
+                <TableCell className="py-4 align-middle text-sm text-muted-foreground">
+                  {user?.fullName ?? item.owner}
+                </TableCell>
+                <TableCell className="py-4 align-middle text-sm text-muted-foreground">
+                  {item.type === "folder"
+                    ? "\u2014"
+                    : formatFileSize(item.size ?? 0)}
+                </TableCell>
+                <TableCell className="py-4 align-middle text-sm text-muted-foreground">
+                  {formatDate(item.modified_at)}
+                </TableCell>
+                <TableCell>
+                  {hoveredId === item.id && (
+                    <DropdownMenu
+                      open={openMenuId === item.id}
+                      onOpenChange={(open) =>
+                        setOpenMenuId(open ? item.id : null)
+                      }
+                    >
                         <DropdownMenuTrigger
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                          >
+                          <span className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "h-8 w-8")}>
                             <Ellipsis className="h-4 w-4" />
                             <span className="sr-only">Open menu</span>
-                          </Button>
+                          </span>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuContent align="end" className="w-48">
+                        {item.type === "file" && (
                           <DropdownMenuItem
-                            onClick={() =>
-                              handleMenuAction("download", item)
+                            onClick={(e) =>
+                              handleMenuAction(e, "download", item)
                             }
                             className="gap-2"
                           >
                             <Download className="h-4 w-4" />
                             Download
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleMenuAction("share", item)}
-                            className="gap-2"
-                          >
-                            <Share2 className="h-4 w-4" />
-                            Share
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleMenuAction("star", item)}
-                            className="gap-2"
-                          >
-                            <Star className="h-4 w-4" />
-                            Star
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleMenuAction("rename", item)}
-                            className="gap-2"
-                          >
-                            <Edit className="h-4 w-4" />
-                            Rename
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onClick={() => handleMenuAction("delete", item)}
-                            className="gap-2"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </TableCell>
-                </TableRow>
+                        )}
+                        <DropdownMenuItem
+                          onClick={(e) => handleMenuAction(e, "share", item)}
+                          className="gap-2"
+                        >
+                          <Share2 className="h-4 w-4" />
+                          Share
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => handleMenuAction(e, "star", item)}
+                          className="gap-2"
+                        >
+                          <Star className="h-4 w-4" />
+                          Star
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => handleMenuAction(e, "rename", item)}
+                          className="gap-2"
+                        >
+                          <Edit className="h-4 w-4" />
+                          Rename
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={(e) => handleMenuAction(e, "delete", item)}
+                          className="gap-2"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                </TableCell>
               </ContextMenuTrigger>
               <ContextMenuContent className="w-48">
+                {item.type === "file" && (
+                  <ContextMenuItem
+                    onClick={(e) => handleMenuAction(e, "download", item)}
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download
+                  </ContextMenuItem>
+                )}
                 <ContextMenuItem
-                  onClick={() => handleMenuAction("download", item)}
-                  className="gap-2"
-                >
-                  <Download className="h-4 w-4" />
-                  Download
-                </ContextMenuItem>
-                <ContextMenuItem
-                  onClick={() => handleMenuAction("share", item)}
+                  onClick={(e) => handleMenuAction(e, "share", item)}
                   className="gap-2"
                 >
                   <Share2 className="h-4 w-4" />
                   Share
                 </ContextMenuItem>
                 <ContextMenuItem
-                  onClick={() => handleMenuAction("rename", item)}
+                  onClick={(e) => handleMenuAction(e, "rename", item)}
                   className="gap-2"
                 >
                   <Edit className="h-4 w-4" />
@@ -263,7 +279,7 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
                 <ContextMenuSeparator />
                 <ContextMenuItem
                   variant="destructive"
-                  onClick={() => handleMenuAction("delete", item)}
+                  onClick={(e) => handleMenuAction(e, "delete", item)}
                   className="gap-2"
                 >
                   <Trash2 className="h-4 w-4" />
