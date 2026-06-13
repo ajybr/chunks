@@ -47,6 +47,14 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { toast } from "sonner";
 import type { Node } from "@/lib/types";
 
@@ -61,6 +69,9 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Node | null>(null);
+  const [renameTarget, setRenameTarget] = useState<Node | null>(null);
+  const [renameName, setRenameName] = useState("");
+  const [renameLoading, setRenameLoading] = useState(false);
 
   const formatDate = (date: Date | string | null | undefined) => {
     if (!date) return "\u2014";
@@ -94,15 +105,8 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
         break;
       }
       case "rename": {
-        const name = prompt("Rename:", item.name);
-        if (name && name !== item.name) {
-          const res = await fetch(`/api/nodes/${item.id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name }),
-          });
-          if (res.ok) router.refresh();
-        }
+        setRenameTarget(item);
+        setRenameName(item.name);
         break;
       }
       case "star": {
@@ -136,6 +140,30 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
       router.refresh()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to move to trash", { position: "bottom-right" })
+    }
+  }
+
+  const handleRenameConfirm = async () => {
+    if (!renameTarget || !renameName.trim() || renameName.trim() === renameTarget.name) return
+    setRenameLoading(true)
+    try {
+      const res = await fetch(`/api/nodes/${renameTarget.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: renameName.trim() }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? "Failed to rename")
+      }
+      toast.success(`Renamed to "${renameName.trim()}"`, { position: "bottom-right" })
+      setRenameTarget(null)
+      setRenameName("")
+      router.refresh()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to rename", { position: "bottom-right" })
+    } finally {
+      setRenameLoading(false)
     }
   }
 
@@ -324,6 +352,33 @@ export function FileTable({ items, onFolderClick }: FileTableProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <Dialog
+        open={renameTarget !== null}
+        onOpenChange={(open) => { if (!open) { setRenameTarget(null); setRenameName("") } }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rename</DialogTitle>
+          </DialogHeader>
+          <Input
+            value={renameName}
+            onChange={(e) => setRenameName(e.target.value)}
+            placeholder="New name"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleRenameConfirm()
+            }}
+            autoFocus
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setRenameTarget(null); setRenameName("") }}>
+              Cancel
+            </Button>
+            <Button onClick={handleRenameConfirm} disabled={renameLoading || !renameName.trim() || renameName.trim() === renameTarget?.name}>
+              {renameLoading ? "Renaming..." : "Rename"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
